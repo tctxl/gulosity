@@ -73,7 +73,8 @@ public class RowsEvent extends ChannelEvent {
 
     private RowEntity columnValueGet(BitSet columnsBit, ByteBuffer buffer, TableMapEvent.Column[] columns) {
         TableMapEvent tableMap = getTable(tableId);
-        RowEntity rowEntity = new RowEntity(columns.length,type,tableMap.getSchemaName(),tableMap.getTableName(),tableId);
+
+        RowEntity rowEntity = new RowEntity(columns.length,type,tableMap.getSchemaName(),tableMap.getTableName(),tableMap.getColumnInfo(),tableId);
         int nullBitLength = 0;
         for(int i=0;i<columnsNumber;i++){
             if(columnsBit.get(i))

@@ -10,11 +10,21 @@ public class MysqlAuthInfoEntity {
     private String userName;
     private String passWord;
     private String databaseName;
+    private long serverId;
 
-    public MysqlAuthInfoEntity(InetSocketAddress address, String userName, String passWord) {
+    public MysqlAuthInfoEntity(InetSocketAddress address, String userName, String passWord,long serverId) {
         this.address = address;
         this.userName = userName;
         this.passWord = passWord;
+        this.serverId = serverId;
+    }
+
+    public long getServerId() {
+        return serverId;
+    }
+
+    public void setServerId(long serverId) {
+        this.serverId = serverId;
     }
 
     public InetSocketAddress getAddress() {

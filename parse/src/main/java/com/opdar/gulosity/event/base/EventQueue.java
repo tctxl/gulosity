@@ -40,7 +40,6 @@ public class EventQueue implements Runnable {
                         e.printStackTrace();
                     }
                     if (running.get()) {
-                        logger.debug("loop event.");
                         new Thread(new EventDo(handler)).start();
                     }
                 }
@@ -78,9 +77,7 @@ public class EventQueue implements Runnable {
         public void run() {
             Event event = queue.poll();
             try {
-                logger.debug("doing event." + event);
                 event.doing();
-                logger.debug("event is ok.");
                 handler.success(event);
             } catch (Exception e) {
                 handler.error(event, e);

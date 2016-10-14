@@ -2,7 +2,9 @@ package com.opdar.gulosity.base;
 
 import com.opdar.gulosity.event.binlog.TableMapEvent;
 
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -14,7 +16,7 @@ public class MysqlContext {
     private static ConcurrentHashMap<Class<?>, Object> objects = new ConcurrentHashMap<Class<?>, Object>();
     private static ConcurrentHashMap<Long, TableMapEvent> tables = new ConcurrentHashMap<Long, TableMapEvent>();
     private static LinkedList<RowCallback> rowCallbacks = new LinkedList<RowCallback>();
-
+    private static Map<String, LinkedList<String>> tablesCache = new HashMap<String, LinkedList<String>>();
     public static <T> T get(Class<T> eventCls) {
         return objects.containsKey(eventCls)? (T) objects.get(eventCls) :null;
     }
@@ -23,6 +25,10 @@ public class MysqlContext {
         if (callback != null) {
             rowCallbacks.add(callback);
         }
+    }
+
+    public static void putTableCache(Map<? extends String, ? extends LinkedList<String>> m) {
+        tablesCache.putAll(m);
     }
 
     public static LinkedList<RowCallback> getRowCallbacks() {
@@ -34,6 +40,11 @@ public class MysqlContext {
     }
 
     public static void addTable(TableMapEvent table){
+        String tableName = table.getSchemaName().concat(".").concat(table.getTableName());
+        if(tablesCache.containsKey(tableName)){
+            LinkedList<String> list = tablesCache.get(tableName);
+            table.setColumnInfo(list);
+        }
         tables.put(table.getTableId(),table);
     }
 

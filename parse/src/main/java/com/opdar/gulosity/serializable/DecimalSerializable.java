@@ -9,7 +9,9 @@ import java.nio.ByteBuffer;
  * Created by Shey on 2016/8/27.
  */
 public class DecimalSerializable extends JavaSerializable<BigDecimal> {
+    //长度与byte字节数长度的换算
     private static final int dig2bytes[] = {0, 1, 1, 2, 2, 3, 3, 4, 4, 4};
+    //一个Int所表示的长度
     private static final int DIG_PER_DEC1 = 9;
 
     public DecimalSerializable(int type) {
@@ -44,12 +46,12 @@ public class DecimalSerializable extends JavaSerializable<BigDecimal> {
         System.arraycopy(ucharBuf, 0, dest, 1, dest.length-1);
 
         StringBuilder builder = new StringBuilder();
-        int d = calculate(builder, intg0x, intg1, unsigned, dest);
+        int d = calculate(builder, intg0x, intg1, dest);
         //计算小数点后面的数字
         if (scale > 0) {
             dest = new byte[bin_size-d];
             System.arraycopy(ucharBuf, d-1, dest, 0, dest.length    );
-            calculate(builder.append("."), frac0x, frac1, true, dest);
+            calculate(builder.append("."), frac0x, frac1, dest);
         }
         if(!unsigned){
             builder.insert(0,'-');
@@ -57,7 +59,7 @@ public class DecimalSerializable extends JavaSerializable<BigDecimal> {
         return new BigDecimal(builder.toString());
     }
 
-    private int calculate(StringBuilder builder, int intg0x, int intg1, boolean unsigned, byte[] ucharBuf) {
+    private int calculate(StringBuilder builder, int intg0x, int intg1,  byte[] ucharBuf) {
         int d = 0;
         int len = 0;
         byte[] dest = null;

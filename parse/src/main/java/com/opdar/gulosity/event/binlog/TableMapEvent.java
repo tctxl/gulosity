@@ -1,12 +1,17 @@
 package com.opdar.gulosity.event.binlog;
 
 import com.opdar.gulosity.base.Constants;
+import com.opdar.gulosity.connection.entity.Column;
 import com.opdar.gulosity.event.base.ChannelEvent;
 import com.opdar.gulosity.utils.BufferUtils;
+import com.opdar.gulosity.utils.MysqlUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.BitSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Shey on 2016/8/25.
@@ -22,9 +27,18 @@ public class TableMapEvent extends ChannelEvent {
     private int columnCount;
     private Column[] columns;
     private BitSet bitmap;// [len=(column_count + 8) / 7]
+    private LinkedList<String> columnInfo;
 
     public TableMapEvent(BinlogHeader header, SocketChannel channel) {
         super(header, channel);
+    }
+
+    public void setColumnInfo(LinkedList<String> columnInfo) {
+        this.columnInfo = columnInfo;
+    }
+
+    public LinkedList<String> getColumnInfo() {
+        return columnInfo;
     }
 
     public class Column {
@@ -94,6 +108,7 @@ public class TableMapEvent extends ChannelEvent {
             }
         }
         bitmap = BufferUtils.readBitmap(columnCount,buffer);
+
     }
 
     public long getTableId() {

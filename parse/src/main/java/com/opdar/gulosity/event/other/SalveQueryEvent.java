@@ -9,6 +9,7 @@ import com.opdar.gulosity.error.NotSupportBinlogException;
 import com.opdar.gulosity.event.base.Event;
 import com.opdar.gulosity.event.binlog.SalveFetchEvent;
 import com.opdar.gulosity.utils.BufferUtils;
+import com.opdar.gulosity.utils.MysqlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class SalveQueryEvent implements Event {
     }
 
     public void doing() {
-        List<Map<Column, String>> result = connection.query(Constants.SHOW_MASTER_STATUS);
+        List<Map<Column, String>> result = MysqlUtils.query(connection.getChannel(),Constants.SHOW_MASTER_STATUS);
         logger.debug(result.toString());
         if(result.size() > 0){
             Map<Column, String> map = result.get(0);
@@ -45,7 +46,7 @@ public class SalveQueryEvent implements Event {
                     salveEntity.setFile(column.getValue());
                 }
             }
-            salveEntity.setSalveId(3);
+            salveEntity.setSalveId((int) connection.getAuthInfo().getServerId());
 
             //salve协议准备发送(binlog dump)
 

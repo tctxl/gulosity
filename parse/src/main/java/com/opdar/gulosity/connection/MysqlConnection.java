@@ -40,8 +40,16 @@ public class MysqlConnection {
     private AtomicBoolean connected = new AtomicBoolean();
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    public AtomicBoolean getConnected() {
+        return connected;
+    }
+
     public MysqlConnection(MysqlAuthInfoEntity authInfo) {
         this.authInfo = authInfo;
+    }
+
+    public MysqlAuthInfoEntity getAuthInfo() {
+        return authInfo;
     }
 
     public SocketChannel getChannel() {
@@ -186,59 +194,14 @@ public class MysqlConnection {
         System.arraycopy(apdp2, 0, scrumble, apdp1.length, apdp2.length);
 
     }
-
-    public List<Map<Column, String>> query(String CMD) {
-        List<Map<Column, String>> list = new LinkedList<Map<Column, String>>();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        outputStream.write(0x03);
+    public void close() {
         try {
-            outputStream.write(CMD.getBytes("UTF-8"));
+            channel.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            connected.set(false);
         }
-        try {
-            HeaderProtocol headerProtocol = new HeaderProtocol();
-            headerProtocol.setBodyLength(outputStream.size());
-            headerProtocol.setSequence((byte) 0);
-            channel.write(new ByteBuffer[]{ByteBuffer.wrap(headerProtocol.toBytes()), ByteBuffer.wrap(outputStream.toByteArray())});
-            Body body = Body.get(channel);
-            body.check();
-            ByteBuffer bodyBuf = body.getBody();
-            if (body.getHeader().getSequence() == 1) {
-                //获取列(Column)数目
-                int columnCount = bodyBuf.get();
-                List<Column> columns = new LinkedList<Column>();
-                for (int i = 0; i < columnCount; i++) {
-                    body = Body.get(channel);
-                    ColumnParser columnParser = new ColumnParser();
-                    Column column = columnParser.parser(body.getBody());
-                    columns.add(column);
-                }
-                //列循环完毕,读取EOF
-                body = Body.get(channel);
-                if (body.getBody().get() != Constants.MYSQL.EOF) {
-                    logger.error("EOF读取错误.");
-                }
-                //获取行数据
-                while (true) {
-                    body = Body.get(channel);
-                    if (body.getState() == Constants.MYSQL.EOF) {
-                        break;
-                    }
-                    RowParser parser = new RowParser();
-                    List<String> row = parser.parser(body.getBody());
-                    Map<Column, String> map = new HashMap<Column, String>();
-                    for (int i = 0; i < columns.size(); i++) {
-                        Column column = columns.get(i);
-                        map.put(column, row.get(i));
-                    }
-                    list.add(map);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     public void waitConnect() {
