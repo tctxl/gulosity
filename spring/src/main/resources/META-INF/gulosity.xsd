@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema
+        xmlns="http://www.opdar.com/schema/gulosity"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        targetNamespace="http://www.opdar.com/schema/gulosity"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+    <xsd:element name="context">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="host" type="xsd:string"/>
+                    <xsd:attribute name="port" type="xsd:int"/>
+                    <xsd:attribute name="userName" type="xsd:string"/>
+                    <xsd:attribute name="passWord" type="xsd:string"/>
+                    <xsd:attribute name="defaultDatabaseName" type="xsd:string"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="listeners" id="listeners">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:sequence>
+                        <xsd:element name="list" type="listener" minOccurs="0" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="listener" >
+        <xsd:sequence>
+            <xsd:element name="listener" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute use="required" name="class" type="xsd:string"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

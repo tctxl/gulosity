@@ -207,7 +207,6 @@ public class MysqlConnection {
             if (body.getHeader().getSequence() == 1) {
                 //获取列(Column)数目
                 int columnCount = bodyBuf.get();
-                logger.info("查询到{}列", columnCount);
                 List<Column> columns = new LinkedList<Column>();
                 for (int i = 0; i < columnCount; i++) {
                     body = Body.get(channel);

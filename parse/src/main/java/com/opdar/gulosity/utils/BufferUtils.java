@@ -82,6 +82,15 @@ public class BufferUtils {
         return readFixedString(buffer, length, Charset.defaultCharset());
     }
 
+    public static long readLong(byte[] buffer,int bit){
+        long result = 0;
+        for (int i = 0; i < bit; ++i) {
+            int c = buffer[i];
+            result |= ((c&0xff) <<(8*i));
+        }
+        return result;
+    }
+
     public static long readLong(ByteBuffer buffer,int bit){
         long result = 0;
         for (int i = 0; i < bit; ++i) {
