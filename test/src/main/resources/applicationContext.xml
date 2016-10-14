@@ -4,20 +4,19 @@
        xmlns:gulosity="http://www.opdar.com/schema/gulosity"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-    http://www.springframework.org/schema/context
-    http://www.springframework.org/schema/context/spring-context-3.1.xsd
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
        http://www.opdar.com/schema/gulosity
-       http://www.opdar.com/schema/gulosity.xsd ">
-    <!-- jdbc.properties文件路径  -->
-    <context:property-placeholder location="classpath:config.properties" />
+       http://www.opdar.com/schema/gulosity.xsd">
 
-    <gulosity:context id="gulosity" host="192.168.1.147" port="10912" userName="root" passWord="123456" defaultDatabaseName="mysql" />
-    <!-- 定时任务已经迁移到 crontab 模块中 <import resource="spring-quartz.xml"/>-->
-    <gulosity:listeners id="listeners">
-        <gulosity:list>
-            <gulosity:listener class="test.TestListener" />
-        </gulosity:list>
-    </gulosity:listeners>
+    <context:component-scan base-package="test"/>
 
+    <gulosity:context serverId="10" id="gulosity" host="192.168.1.147" port="10912" userName="root" passWord="123456"
+                      defaultDatabaseName="mysql">
+        <gulosity:listeners>
+            <gulosity:listener class="test.TestListener"/>
+        </gulosity:listeners>
+    </gulosity:context>
+    <bean id="cacheBeanPostProcessor" class="com.opdar.gulosity.spring.processors.TableProcessor" />
 </beans>

@@ -8,27 +8,20 @@
         elementFormDefault="qualified"
         attributeFormDefault="unqualified">
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
-    <xsd:element name="context">
-        <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="beans:identifiedType">
-                    <xsd:attribute name="host" type="xsd:string"/>
-                    <xsd:attribute name="port" type="xsd:int"/>
-                    <xsd:attribute name="userName" type="xsd:string"/>
-                    <xsd:attribute name="passWord" type="xsd:string"/>
-                    <xsd:attribute name="defaultDatabaseName" type="xsd:string"/>
-                </xsd:extension>
-            </xsd:complexContent>
-        </xsd:complexType>
-    </xsd:element>
 
-    <xsd:element name="listeners" id="listeners">
+    <xsd:element name="context" id="context">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
                     <xsd:sequence>
-                        <xsd:element name="list" type="listener" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="listeners" type="listener" minOccurs="0" maxOccurs="1"/>
                     </xsd:sequence>
+                    <xsd:attribute name="host" type="xsd:string" use="required"/>
+                    <xsd:attribute name="port" type="xsd:int" use="required"/>
+                    <xsd:attribute name="userName" type="xsd:string" use="required"/>
+                    <xsd:attribute name="passWord" type="xsd:string" use="required"/>
+                    <xsd:attribute name="serverId" type="xsd:int" use="optional"/>
+                    <xsd:attribute name="defaultDatabaseName" type="xsd:string" use="required"/>
                 </xsd:extension>
             </xsd:complexContent>
         </xsd:complexType>

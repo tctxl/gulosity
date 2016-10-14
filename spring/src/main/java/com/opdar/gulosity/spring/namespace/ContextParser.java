@@ -1,10 +1,14 @@
 package com.opdar.gulosity.spring.namespace;
 
+import com.opdar.gulosity.base.MysqlContext;
+import com.opdar.gulosity.base.RowCallback;
 import com.opdar.gulosity.spring.configs.Configuration;
 import com.opdar.gulosity.spring.configs.JdbcConfiguration;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Created by 俊帆 on 2016/10/13.
@@ -22,7 +26,33 @@ public class ContextParser extends AbstractSingleBeanDefinitionParser {
         String userName = element.getAttribute("userName");
         String passWord = element.getAttribute("passWord");
         String defaultDatabaseName = element.getAttribute("defaultDatabaseName");
-        JdbcConfiguration jdbcConfiguration = new JdbcConfiguration(host, Integer.valueOf(port), userName, passWord, defaultDatabaseName);
+        String serverId = element.getAttribute("serverId");
+        if(serverId == null)serverId = "1000";
+
+        NodeList nodes = element.getChildNodes();
+
+        for(int i=0;i<nodes.getLength();i++){
+            Node node = nodes.item(i);
+            if(node instanceof Element){
+                if(node.getNodeName().equals("gulosity:listeners")){
+                    NodeList listenerNodes = node.getChildNodes();
+                    for(int j=0;j<listenerNodes.getLength();j++){
+                        Node listenerNode = listenerNodes.item(j);
+                        if(listenerNode instanceof Element){
+                            String className = ((Element) listenerNode).getAttribute("class");
+                            try {
+                                Class clz = Class.forName(className);
+                                MysqlContext.addRowCallback((RowCallback) clz.newInstance());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        JdbcConfiguration jdbcConfiguration = new JdbcConfiguration(host, Integer.valueOf(port), userName, passWord, defaultDatabaseName,Long.valueOf(serverId));
         jdbcConfiguration.init();
         builder.addPropertyValue("jdbcConfiguration", jdbcConfiguration);
 
