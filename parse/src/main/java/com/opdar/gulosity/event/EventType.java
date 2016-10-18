@@ -6,6 +6,7 @@ import com.opdar.gulosity.connection.protocol.HeaderProtocol;
 import com.opdar.gulosity.event.base.ChannelEvent;
 import com.opdar.gulosity.event.base.Event;
 import com.opdar.gulosity.event.binlog.*;
+import com.opdar.gulosity.persistence.IPersistence;
 import com.opdar.gulosity.utils.BufferUtils;
 
 import java.io.IOException;
@@ -73,6 +74,11 @@ public class EventType {
                 event = new RowsEvent(header,channel, RowsEvent.Type.DELETEV2);
                 break;
             }
+            case XID_EVENT: {
+                event = new XidEvent(header, channel);
+                MysqlContext.add(event);
+                break;
+            }
         }
         if(event != null){
             if(prev != null){
@@ -83,6 +89,10 @@ public class EventType {
             event.doing();
             if(event instanceof TableMapEvent)
                 MysqlContext.addTable((TableMapEvent) event);
+        }
+        if (event != null) {
+            IPersistence persistence = MysqlContext.getPersistence();
+            persistence.commit(event.getHeader().getNextPosition());
         }
         return event;
     }

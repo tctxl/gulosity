@@ -17,6 +17,6 @@ http://www.springframework.org/schema/context/spring-context.xsd
         <gulosity:listeners>
             <gulosity:listener class="test.TestListener"/>
         </gulosity:listeners>
+        <gulosity:mapping package="test" />
     </gulosity:context>
-    <bean id="cacheBeanPostProcessor" class="com.opdar.gulosity.spring.processors.TableProcessor" />
 </beans>

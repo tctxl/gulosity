@@ -12,6 +12,7 @@
         <module>parse</module>
         <module>spring</module>
         <module>test</module>
+        <module>extras</module>
     </modules>
 
     <dependencies>

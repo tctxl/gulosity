@@ -31,11 +31,12 @@ public class JdbcConfiguration {
     private long serverId;
     private Logger logger = LoggerFactory.getLogger(getClass());
     private MysqlConnection connection;
+    private boolean runInMainThread = false;
 
     public JdbcConfiguration() {
     }
 
-    public JdbcConfiguration(String host, Integer port, String userName, String passWord, String defaultDatabaseName,long serverId) {
+    public JdbcConfiguration(String host, Integer port, String userName, String passWord, String defaultDatabaseName, long serverId) {
         this.host = host;
         this.port = port;
         this.userName = userName;
@@ -45,7 +46,7 @@ public class JdbcConfiguration {
     }
 
     public void init() {
-        MysqlAuthInfoEntity authInfo = new MysqlAuthInfoEntity(new InetSocketAddress(host, port), userName, passWord,serverId);
+        MysqlAuthInfoEntity authInfo = new MysqlAuthInfoEntity(new InetSocketAddress(host, port), userName, passWord, serverId);
         authInfo.setDatabaseName(defaultDatabaseName);
         caching(authInfo);
         connection = new MysqlConnection(authInfo);
@@ -79,17 +80,21 @@ public class JdbcConfiguration {
         }
     }
 
-    public void caching(MysqlAuthInfoEntity authInfo){
+    public void caching(MysqlAuthInfoEntity authInfo) {
         TableCache tableCache = new TableCache(authInfo, new TableCacheCallback() {
             @Override
             public void callback(Map<String, LinkedList<String>> tables) {
                 MysqlContext.putTableCache(tables);
             }
         });
-        new Thread(tableCache).start();
+        tableCache.run();
     }
 
     public MysqlConnection getConnection() {
         return connection;
+    }
+
+    public void setRunInMainThread(boolean runInMainThread) {
+        this.runInMainThread = runInMainThread;
     }
 }

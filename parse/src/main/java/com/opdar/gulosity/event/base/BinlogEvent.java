@@ -80,4 +80,14 @@ public abstract class BinlogEvent implements Event {
         this.header = header;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Long){
+            return (Long)obj == header.getNextPosition();
+        }
+        if(obj instanceof BinlogEvent){
+            return ((BinlogEvent) obj).header.getNextPosition() == header.getNextPosition();
+        }
+        return super.equals(obj);
+    }
 }

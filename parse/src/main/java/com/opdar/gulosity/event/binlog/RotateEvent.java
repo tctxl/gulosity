@@ -1,5 +1,6 @@
 package com.opdar.gulosity.event.binlog;
 
+import com.opdar.gulosity.base.MysqlContext;
 import com.opdar.gulosity.event.base.ChannelEvent;
 import com.opdar.gulosity.utils.BufferUtils;
 
@@ -38,5 +39,7 @@ public class RotateEvent extends ChannelEvent {
         int length = (int) (getHeader().getEventLength() - 8 - 19);
         ByteBuffer dst2 = BufferUtils.readFixedData(getChannel(), length);
         fileName = new String(dst2.array(), 0, length);
+        MysqlContext.getPersistence().commit(position);
+        MysqlContext.getPersistence().setFileName(fileName);
     }
 }

@@ -9,12 +9,17 @@
         attributeFormDefault="unqualified">
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
 
-    <xsd:element name="context" id="context">
+    <xsd:element name="gulosity-context" id="gulosity-context">
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
                     <xsd:sequence>
                         <xsd:element name="listeners" type="listener" minOccurs="0" maxOccurs="1"/>
+                        <xsd:element name="mapping" maxOccurs="1" minOccurs="0">
+                            <xsd:complexType>
+                                <xsd:attribute name="package" type="xsd:string"/>
+                            </xsd:complexType>
+                        </xsd:element>
                     </xsd:sequence>
                     <xsd:attribute name="host" type="xsd:string" use="required"/>
                     <xsd:attribute name="port" type="xsd:int" use="required"/>
@@ -26,7 +31,7 @@
             </xsd:complexContent>
         </xsd:complexType>
     </xsd:element>
-    <xsd:complexType name="listener" >
+    <xsd:complexType name="listener">
         <xsd:sequence>
             <xsd:element name="listener" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>

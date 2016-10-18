@@ -1,10 +1,11 @@
 package com.opdar.gulosity.spring.listeners;
 
+import com.opdar.gulosity.base.MysqlContext;
 import com.opdar.gulosity.base.RowCallback;
 import com.opdar.gulosity.entity.RowEntity;
+import com.opdar.gulosity.persistence.IPersistence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -30,20 +31,23 @@ public abstract class DefaultAutoMappingListener implements RowCallback {
             Class<?> clz = classes.get(entity.getTableName());
             Field[] fields = clz.getDeclaredFields();
             Object obj = instanceObject(entity, clz, fields);
-            switch (entity.getEventType()) {
-                case WRITEV1:
-                case WRITEV2:
-                    onInsert(obj);
-                    break;
-                case DELETEV1:
-                case DELETEV2:
-                    onDelete(obj);
-                    break;
-                case UPDATEV1:
-                case UPDATEV2:
-                    Object obj2 = instanceObject(entity2, clz, fields);
-                    onUpdate(obj,obj2);
-                    break;
+            try{
+                switch (entity.getEventType()) {
+                    case WRITEV1:
+                    case WRITEV2:
+                        onInsert(obj);
+                        break;
+                    case DELETEV1:
+                    case DELETEV2:
+                        onDelete(obj);
+                        break;
+                    case UPDATEV1:
+                    case UPDATEV2:
+                        Object obj2 = instanceObject(entity2, clz, fields);
+                        onUpdate(obj,obj2);
+                        break;
+                }
+            }finally {
             }
         }
     }

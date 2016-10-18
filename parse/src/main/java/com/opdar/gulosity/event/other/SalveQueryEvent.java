@@ -1,6 +1,7 @@
 package com.opdar.gulosity.event.other;
 
 import com.opdar.gulosity.base.Constants;
+import com.opdar.gulosity.base.MysqlContext;
 import com.opdar.gulosity.connection.MysqlConnection;
 import com.opdar.gulosity.connection.entity.Column;
 import com.opdar.gulosity.connection.entity.SalveEntity;
@@ -8,6 +9,7 @@ import com.opdar.gulosity.connection.protocol.HeaderProtocol;
 import com.opdar.gulosity.error.NotSupportBinlogException;
 import com.opdar.gulosity.event.base.Event;
 import com.opdar.gulosity.event.binlog.SalveFetchEvent;
+import com.opdar.gulosity.persistence.IPersistence;
 import com.opdar.gulosity.utils.BufferUtils;
 import com.opdar.gulosity.utils.MysqlUtils;
 import org.slf4j.Logger;
@@ -32,18 +34,23 @@ public class SalveQueryEvent implements Event {
     }
 
     public void doing() {
+        SalveEntity salveEntity  = new SalveEntity();
         List<Map<Column, String>> result = MysqlUtils.query(connection.getChannel(),Constants.SHOW_MASTER_STATUS);
-        logger.debug(result.toString());
         if(result.size() > 0){
-            Map<Column, String> map = result.get(0);
-            SalveEntity salveEntity  = new SalveEntity();
-            for(Iterator<Map.Entry<Column, String>> it = map.entrySet().iterator();it.hasNext();){
-                Map.Entry<Column, String> column = it.next();
-                if(column.getKey().getName().equals(Constants.POSITION)){
-                    salveEntity.setPosition(Integer.valueOf(column.getValue()));
-                }
-                if(column.getKey().getName().equals(Constants.FILE)){
-                    salveEntity.setFile(column.getValue());
+            IPersistence persistence = MysqlContext.getPersistence();
+            if(persistence != null && persistence.getFileName() != null){
+                salveEntity.setPosition((int) persistence.getPosition());
+                salveEntity.setFile(persistence.getFileName());
+            }else{
+                Map<Column, String> map = result.get(0);
+                for(Iterator<Map.Entry<Column, String>> it = map.entrySet().iterator();it.hasNext();){
+                    Map.Entry<Column, String> column = it.next();
+                    if(column.getKey().getName().equals(Constants.POSITION)){
+                        salveEntity.setPosition(Integer.valueOf(column.getValue()));
+                    }
+                    if(column.getKey().getName().equals(Constants.FILE)){
+                        salveEntity.setFile(column.getValue());
+                    }
                 }
             }
             salveEntity.setSalveId((int) connection.getAuthInfo().getServerId());

@@ -1,6 +1,8 @@
 package com.opdar.gulosity.base;
 
 import com.opdar.gulosity.event.binlog.TableMapEvent;
+import com.opdar.gulosity.persistence.FilePersistence;
+import com.opdar.gulosity.persistence.IPersistence;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,8 +19,18 @@ public class MysqlContext {
     private static ConcurrentHashMap<Long, TableMapEvent> tables = new ConcurrentHashMap<Long, TableMapEvent>();
     private static LinkedList<RowCallback> rowCallbacks = new LinkedList<RowCallback>();
     private static Map<String, LinkedList<String>> tablesCache = new HashMap<String, LinkedList<String>>();
+    private static IPersistence persistence = new FilePersistence("./salve.conf");
+
+    public static void setPersistence(IPersistence persistence) {
+        MysqlContext.persistence = persistence;
+    }
+
+    public static IPersistence getPersistence() {
+        return persistence;
+    }
+
     public static <T> T get(Class<T> eventCls) {
-        return objects.containsKey(eventCls)? (T) objects.get(eventCls) :null;
+        return objects.containsKey(eventCls) ? (T) objects.get(eventCls) : null;
     }
 
     public static void addRowCallback(RowCallback callback) {
@@ -35,20 +47,20 @@ public class MysqlContext {
         return rowCallbacks;
     }
 
-    public static <T>void add(T event) {
+    public static <T> void add(T event) {
         objects.put(event.getClass(), event);
     }
 
-    public static void addTable(TableMapEvent table){
+    public static void addTable(TableMapEvent table) {
         String tableName = table.getSchemaName().concat(".").concat(table.getTableName());
-        if(tablesCache.containsKey(tableName)){
+        if (tablesCache.containsKey(tableName)) {
             LinkedList<String> list = tablesCache.get(tableName);
             table.setColumnInfo(list);
         }
-        tables.put(table.getTableId(),table);
+        tables.put(table.getTableId(), table);
     }
 
-    public static TableMapEvent getTable(Long id){
+    public static TableMapEvent getTable(Long id) {
         return tables.get(id);
     }
 }

@@ -20,6 +20,7 @@ public class Constants {
         public static final int ROTATE_EVENT = 0x04;
         public static final int FORMAT_DESCRIPTION_EVENT = 0x0f;
         public static final int QUERY_EVENT = 0x02;
+        public static final int XID_EVENT = 0x10;
         public static final int TABLE_MAP_EVENT = 0x13;
         public static final int WRITE_ROWS_EVENTv1 = 0x17;
         public static final int UPDATE_ROWS_EVENTv1 = 0x18;
@@ -27,11 +28,9 @@ public class Constants {
         public static final int WRITE_ROWS_EVENTv2 = 0x1e;
         public static final int UPDATE_ROWS_EVENTv2 = 0x1f;
         public static final int DELETE_ROWS_EVENTv2 = 0x20;
-
         public static final int NEW_LOAD_EVENT = 12;
         public static final int RAND_EVENT = 13;
         public static final int USER_VAR_EVENT = 14;
-        public static final int XID_EVENT = 16;
         public static final int BEGIN_LOAD_QUERY_EVENT = 17;
         public static final int EXECUTE_LOAD_QUERY_EVENT = 18;
     }
