@@ -3,7 +3,6 @@ package com.opdar.gulosity.serializable;
 import com.opdar.gulosity.utils.BufferUtils;
 
 import java.nio.ByteBuffer;
-import java.sql.Types;
 
 /**
  * Created by Shey on 2016/8/27.
@@ -19,8 +18,8 @@ public class BitSerializable extends JavaSerializable<Long> {
         int len = (nbits + 7) / 8;
         long value = 0;
         if (nbits > 1) {
-            byte[] result =  BufferUtils.readFixedData(buffer,len);
-            value = BufferUtils.readBELog(result,len);
+            byte[] result = BufferUtils.readFixedData(buffer, len);
+            value = BufferUtils.readBELog(result, len);
         } else {
             value = buffer.get();
         }

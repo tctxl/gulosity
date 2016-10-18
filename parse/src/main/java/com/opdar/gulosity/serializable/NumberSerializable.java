@@ -1,8 +1,6 @@
 package com.opdar.gulosity.serializable;
 
 import com.opdar.gulosity.event.base.BinlogEvent;
-import com.opdar.gulosity.event.binlog.BinlogHeader;
-import com.opdar.gulosity.event.binlog.TableMapEvent;
 import com.opdar.gulosity.utils.BufferUtils;
 
 import java.nio.ByteBuffer;
@@ -18,22 +16,22 @@ public class NumberSerializable extends JavaSerializable<Number> {
 
     @Override
     public Number getValue(int meta, ByteBuffer buffer) {
-        if(type == BinlogEvent.TINY){
+        if (type == BinlogEvent.TINY) {
             return buffer.get();
         }
-        if(type == BinlogEvent.SHORT){
+        if (type == BinlogEvent.SHORT) {
             return buffer.getShort();
         }
-        if(type == BinlogEvent.INT24){
-            return BufferUtils.readLong(buffer,3);
+        if (type == BinlogEvent.INT24) {
+            return BufferUtils.readLong(buffer, 3);
         }
-        if(type == BinlogEvent.LONGLONG){
+        if (type == BinlogEvent.LONGLONG) {
             return buffer.getLong();
         }
-        if(type == BinlogEvent.FLOAT){
+        if (type == BinlogEvent.FLOAT) {
             return buffer.getFloat();
         }
-        if(type == BinlogEvent.DOUBLE){
+        if (type == BinlogEvent.DOUBLE) {
             return buffer.getDouble();
         }
         return buffer.getInt();

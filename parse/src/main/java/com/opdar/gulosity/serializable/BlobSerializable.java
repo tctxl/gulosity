@@ -1,9 +1,6 @@
 package com.opdar.gulosity.serializable;
 
-import com.opdar.gulosity.utils.BufferUtils;
-
 import java.nio.ByteBuffer;
-import java.sql.Types;
 
 /**
  * Created by 俊帆 on 2016/10/12.
@@ -34,7 +31,7 @@ public class BlobSerializable extends JavaSerializable<ByteBuffer> {
             }
         }
 
-        if(len > 0){
+        if (len > 0) {
             byte[] binary = new byte[len];
             buffer.get(binary);
             return ByteBuffer.wrap(binary);

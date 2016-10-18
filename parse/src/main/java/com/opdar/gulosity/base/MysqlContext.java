@@ -19,7 +19,7 @@ public class MysqlContext {
     private static ConcurrentHashMap<Long, TableMapEvent> tables = new ConcurrentHashMap<Long, TableMapEvent>();
     private static LinkedList<RowCallback> rowCallbacks = new LinkedList<RowCallback>();
     private static Map<String, LinkedList<String>> tablesCache = new HashMap<String, LinkedList<String>>();
-    private static IPersistence persistence = new FilePersistence("./salve.conf");
+    private static IPersistence persistence = new FilePersistence("./salve.dat");
 
     public static void setPersistence(IPersistence persistence) {
         MysqlContext.persistence = persistence;
