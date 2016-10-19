@@ -13,4 +13,9 @@ import java.lang.annotation.*;
 @Component
 public @interface Table {
     String value();
+    boolean camelCase() default false;
+    public enum CaseExtension{
+        NULL,UPPER,LOWER
+    }
+    CaseExtension extension() default CaseExtension.NULL;
 }

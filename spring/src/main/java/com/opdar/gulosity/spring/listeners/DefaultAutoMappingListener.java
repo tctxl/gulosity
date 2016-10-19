@@ -4,6 +4,9 @@ import com.opdar.gulosity.base.MysqlContext;
 import com.opdar.gulosity.base.RowCallback;
 import com.opdar.gulosity.entity.RowEntity;
 import com.opdar.gulosity.persistence.IPersistence;
+import com.opdar.gulosity.spring.annotations.Table;
+import com.opdar.gulosity.spring.annotations.TableField;
+import com.opdar.gulosity.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,10 +59,31 @@ public abstract class DefaultAutoMappingListener implements RowCallback {
         Object obj = null;
         try {
             obj = clz.newInstance();
+            Table table = clz.getAnnotation(Table.class);
             for(Field field:fields){
                 field.setAccessible(true);
-                int index = entity.getColumnInfo().indexOf(field.getName());
-                field.set(obj,entity.getResult()[index]);
+                String fieldName = field.getName();
+                try{
+                    if(table.camelCase()){
+                        //驼峰式命名的字段
+                        Boolean isUpper = null;
+                        switch (table.extension()){
+                            case UPPER:
+                                isUpper = true;
+                            case LOWER:
+                                isUpper = false;
+                        }
+                        fieldName = Utils.testUnderscore(fieldName,isUpper);
+                    }
+                    TableField tableField = field.getAnnotation(TableField.class);
+                    if(tableField != null){
+                        fieldName = tableField.value();
+                    }
+                    int index = entity.getColumnInfo().indexOf(fieldName);
+                    field.set(obj,entity.getResult()[index]);
+                }catch (Exception e){
+                    logger.debug("field [{}] set value failed.{}:{}",fieldName,e,e.getCause());
+                }
             }
         } catch (InstantiationException e) {
             e.printStackTrace();
