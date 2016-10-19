@@ -14,8 +14,8 @@
     <dependencies>
         <dependency>
             <groupId>com.opdar.gulosity</groupId>
-            <artifactId>spring</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <artifactId>gulosity-spring</artifactId>
+            <version>0.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
