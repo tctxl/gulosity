@@ -10,7 +10,7 @@
     <groupId>com.opdar.gulosity</groupId>
     <artifactId>gulosity-all</artifactId>
     <packaging>pom</packaging>
-    <version>0.1</version>
+    <version>0.1.1</version>
     <modules>
         <module>parse</module>
         <module>spring</module>

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>gulosity-all</artifactId>
         <groupId>com.opdar.gulosity</groupId>
-        <version>0.1</version>
+        <version>0.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>gulosity-spring</artifactId>
@@ -14,7 +14,7 @@
         <dependency>
             <groupId>com.opdar.gulosity</groupId>
             <artifactId>gulosity-parse</artifactId>
-            <version>0.1</version>
+            <version>0.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

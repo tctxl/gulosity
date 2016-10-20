@@ -19,6 +19,5 @@ public class XidEvent extends ChannelEvent {
     public void doing() {
         ByteBuffer buffer = BufferUtils.readFixedData(getChannel(), (int) (getHeader().getEventLength() - Constants.MYSQL.FIXED_EVENT_LENGTH));
         long xid = buffer.getLong();
-        System.out.println(xid);
     }
 }

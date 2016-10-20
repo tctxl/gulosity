@@ -6,7 +6,7 @@ import com.opdar.gulosity.spring.annotations.TableField;
 /**
  * Created by 俊帆 on 2016/10/14.
  */
-@Table(value = "nursing.nurs_users",camelCase = true,extension = Table.CaseExtension.NULL)
+@Table(value = "nursing.nurs_users",camelCase = true,extension = Table.CaseExtension.LOWER)
 public class UsersEntity {
     private String id;
     private String userName;

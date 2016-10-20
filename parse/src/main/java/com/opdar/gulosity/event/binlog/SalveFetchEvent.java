@@ -30,7 +30,7 @@ public class SalveFetchEvent implements Event {
 
                     try {
                         Event event = EventType.get(channel);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

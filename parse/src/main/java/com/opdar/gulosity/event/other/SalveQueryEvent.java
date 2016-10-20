@@ -82,7 +82,7 @@ public class SalveQueryEvent implements Event {
                 connection.getChannel().write(new ByteBuffer[]{ByteBuffer.wrap(header.toBytes()),
                         ByteBuffer.wrap(array)});
                 new SalveFetchEvent(connection).doing();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }else{
