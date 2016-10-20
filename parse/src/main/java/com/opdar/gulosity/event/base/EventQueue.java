@@ -55,7 +55,7 @@ public class EventQueue implements Runnable {
         private final Logger logger = LoggerFactory.getLogger(getClass());
 
         public void error(Event event, Exception e) {
-            logger.debug(event + " error");
+            logger.error("event[{}] ,error:",event,e.getCause());
         }
 
         public void success(Event event) {
