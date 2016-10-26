@@ -7,10 +7,12 @@ QQ群：37640301(新) 技(liao)术(tian)群
 
 maven:
 
-<code>
+```xml
+
         <dependency>
             <groupId>com.opdar.gulosity</groupId>
             <artifactId>gulosity-spring</artifactId>
             <version>0.1.1</version>
         </dependency>
-</code>
+
+```
