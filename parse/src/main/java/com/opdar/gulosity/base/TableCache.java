@@ -72,7 +72,7 @@ public class TableCache implements Runnable {
             connection.close();
             if(cacheCallback != null)cacheCallback.callback(tables);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info("Cache schema error!");
         }
     }
 

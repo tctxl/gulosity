@@ -1,5 +1,7 @@
 package com.opdar.gulosity.utils;
 
+import com.opdar.gulosity.error.ConnectionCloseException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -108,7 +110,7 @@ public class BufferUtils {
             dst2.position(0);
             return dst2;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ConnectionCloseException(e);
         }
     }
 

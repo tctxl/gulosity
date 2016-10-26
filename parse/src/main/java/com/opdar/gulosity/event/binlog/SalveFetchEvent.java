@@ -1,6 +1,7 @@
 package com.opdar.gulosity.event.binlog;
 
 import com.opdar.gulosity.connection.MysqlConnection;
+import com.opdar.gulosity.error.ConnectionCloseException;
 import com.opdar.gulosity.event.base.Event;
 import com.opdar.gulosity.event.EventType;
 
@@ -30,7 +31,13 @@ public class SalveFetchEvent implements Event {
 
                     try {
                         Event event = EventType.get(channel);
-                    } catch (Exception e) {
+                    }catch (ConnectionCloseException e){
+                        running.set(false);
+                        throw e;
+                    }catch (IOException e){
+                        running.set(false);
+                        throw new ConnectionCloseException(e);
+                    }catch (Exception e) {
                         e.printStackTrace();
                     }
                 }

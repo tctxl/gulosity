@@ -6,6 +6,7 @@ import com.opdar.gulosity.connection.MysqlConnection;
 import com.opdar.gulosity.connection.entity.Column;
 import com.opdar.gulosity.connection.entity.SalveEntity;
 import com.opdar.gulosity.connection.protocol.HeaderProtocol;
+import com.opdar.gulosity.error.ConnectionCloseException;
 import com.opdar.gulosity.error.NotSupportBinlogException;
 import com.opdar.gulosity.event.base.Event;
 import com.opdar.gulosity.event.binlog.SalveFetchEvent;
@@ -82,7 +83,9 @@ public class SalveQueryEvent implements Event {
                 connection.getChannel().write(new ByteBuffer[]{ByteBuffer.wrap(header.toBytes()),
                         ByteBuffer.wrap(array)});
                 new SalveFetchEvent(connection).doing();
-            } catch (Exception e) {
+            }catch (ConnectionCloseException e){
+                throw e;
+            }catch (Exception e) {
                 e.printStackTrace();
             }
         }else{

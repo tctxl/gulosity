@@ -35,6 +35,8 @@ public class EventQueue implements Runnable {
             while (true) {
                 synchronized (this) {
                     try {
+                        if(queue.size() == 0)
+                        logger.debug("task empty.waiting...");
                         this.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -55,7 +57,7 @@ public class EventQueue implements Runnable {
         private final Logger logger = LoggerFactory.getLogger(getClass());
 
         public void error(Event event, Exception e) {
-            logger.error("event[{}] ,error:",event,e.getCause());
+            logger.debug("event[{}] ,error:{}",event,e.getLocalizedMessage());
         }
 
         public void success(Event event) {
