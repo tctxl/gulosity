@@ -17,14 +17,15 @@ public class TcpServer {
     private EventLoopGroup workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 1);
     private ChannelFuture channelFuture;
 
-    public void start() throws InterruptedException {
+    public void start(int port) throws InterruptedException {
         ServerBootstrap b = new ServerBootstrap();
         ChannelHandler initializer = new Initializer();
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(initializer);
-        channelFuture = b.bind(12034).sync().channel().closeFuture().sync();
+        channelFuture = b.bind(port).sync().channel().closeFuture().sync();
     }
+
     public boolean close() {
         if (channelFuture instanceof DefaultPromise) {
             ((DefaultPromise) channelFuture).setUncancellable();
@@ -36,8 +37,9 @@ public class TcpServer {
 
     public static void main(String[] args){
         TcpServer tcpServer = new TcpServer();
+        int testPort = 12034;
         try {
-            tcpServer.start();
+            tcpServer.start(testPort);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
