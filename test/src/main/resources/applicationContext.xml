@@ -16,6 +16,7 @@
                       defaultDatabaseName="mysql">
         <gulosity:listeners>
             <gulosity:listener class="test.TestListener"/>
+            <gulosity:listener class="com.opdar.gulosity.replication.listeners.StoreRowListener"/>
         </gulosity:listeners>
         <gulosity:mapping package="test" />
     </gulosity:context>

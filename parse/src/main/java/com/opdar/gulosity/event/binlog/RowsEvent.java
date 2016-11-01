@@ -92,12 +92,14 @@ public class RowsEvent extends ChannelEvent {
                 try{
                     JavaSerializable serializable = JavaSerializable.get(column.getColumnTypeDef());
                     Object value = serializable.getValue(column.getColumnMetaDef(),buffer);
-                    rowEntity.set(i,value);
+                    rowEntity.set(i,column.getColumnTypeDef(),value);
                 }catch (Exception e){
                     System.out.println("index : "+i+" , column type is "+ column.getColumnTypeDef());
                     System.out.println(column.getColumnTypeDef());
                     throw new RuntimeException(e);
                 }
+            }else{
+                rowEntity.set(i,column.getColumnTypeDef(),null);
             }
         }
         return rowEntity;

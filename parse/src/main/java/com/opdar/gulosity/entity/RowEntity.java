@@ -4,6 +4,7 @@ import com.opdar.gulosity.event.binlog.RowsEvent;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by 俊帆 on 2016/10/13.
@@ -15,9 +16,11 @@ public class RowEntity {
     private long tableId;
     private RowsEvent.Type eventType;
     private Object[] result;
+    private int[] resultType;
 
     public RowEntity(int columnNum, RowsEvent.Type eventType, String schemaName, String tableName, LinkedList<String> columnInfo, long tableId) {
         result = new Object[columnNum];
+        resultType = new int[columnNum];
         this.eventType = eventType;
         this.tableName = tableName;
         this.tableId = tableId;
@@ -29,16 +32,25 @@ public class RowEntity {
         return result;
     }
 
-    public LinkedList<String> getColumnInfo() {
+    public List<? extends Object> getColumnInfo() {
         return columnInfo;
+    }
+
+    public int[] getResultType() {
+        return resultType;
+    }
+
+    public long getTableId() {
+        return tableId;
     }
 
     public String getTableName() {
         return schemaName+"."+tableName;
     }
 
-    public void set(int index, Object o) {
-        result[index] = o;
+    public void set(int index, int type, Object value) {
+        result[index] = value;
+        resultType[index] = type;
     }
 
     public Object get(int index) {

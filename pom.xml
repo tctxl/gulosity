@@ -16,6 +16,7 @@
         <module>spring</module>
         <module>test</module>
         <module>extras</module>
+        <module>replication</module>
     </modules>
 
     <licenses>
