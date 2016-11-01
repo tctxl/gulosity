@@ -1,9 +1,13 @@
 package com.opdar.gulosity.replication.server.base;
 
+import com.opdar.gulosity.replication.base.Registry;
+import com.opdar.gulosity.replication.server.protocol.RequestPos;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
@@ -11,17 +15,29 @@ import java.nio.ByteBuffer;
  */
 public class IoSession {
     private final ChannelHandlerContext ctx;
+    private String uid;
 
     public IoSession(ChannelHandlerContext ctx) {
         this.ctx = ctx;
     }
 
     public void downline() {
-
+        Registry.remove(uid);
     }
 
     public void heartbeat() {
+        ByteBuffer buffer = ByteBuffer.allocate(9);
+        //type
+        buffer.put((byte)1);
+        buffer.putLong(System.currentTimeMillis());
+        ctx.writeAndFlush(buffer.array()).addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                if (channelFuture.isSuccess()) {
 
+                }
+            }
+        });
     }
 
     public void writeLog(int nextPosition, byte[] ready) {
@@ -38,9 +54,46 @@ public class IoSession {
             @Override
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
                 if (channelFuture.isSuccess()) {
-
                 }
             }
         });
+    }
+
+    public void writePos() {
+        RandomAccessFile randomAccessFile = null;
+        try {
+            randomAccessFile = new RandomAccessFile(Registry.FILE_PATH, "r");
+            int size = (int) randomAccessFile.getChannel().size();
+            writePos(size);
+        } catch (Exception ignored) {}finally {
+            if(randomAccessFile != null) try {
+                randomAccessFile.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void writePos(int position) {
+        ByteBuffer buffer = ByteBuffer.allocate(5);
+        //type
+        buffer.put((byte)3);
+        buffer.putInt(position);
+        ctx.writeAndFlush(buffer.array()).addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                if (channelFuture.isSuccess()) {
+                    Registry.put(uid,IoSession.this);
+                }
+            }
+        });
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getUid() {
+        return uid;
     }
 }

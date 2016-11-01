@@ -1,7 +1,9 @@
 package com.opdar.gulosity.replication.server.base;
 
+import com.opdar.gulosity.replication.base.Registry;
 import com.opdar.gulosity.replication.server.protocol.Heartbeat;
 import com.opdar.gulosity.replication.server.protocol.RequestLog;
+import com.opdar.gulosity.replication.server.protocol.RequestPos;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -60,12 +62,17 @@ public class Handler extends SimpleChannelInboundHandler<Object> {
     public void channelRead0(ChannelHandlerContext ctx, Object result) throws Exception {
         IoSession session = ctx.attr(SESSION_FLAG).get();
         if (result instanceof Heartbeat) {
+            //接收并返回心跳
             session.heartbeat();
         } else if (result instanceof RequestLog) {
-            //主动请求Log
+            //客户端主动请求Log
             byte[] ready = ((RequestLog) result).read();
             int nextPosition = ((RequestLog) result).getPosition() + ready.length;
             session.writeLog(nextPosition, ready);
+        } else if(result instanceof RequestPos){
+            //初始化请求位置
+            session.setUid(((RequestPos) result).getUid());
+            session.writePos();
         }
     }
 

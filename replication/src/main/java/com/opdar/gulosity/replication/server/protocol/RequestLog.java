@@ -2,6 +2,7 @@ package com.opdar.gulosity.replication.server.protocol;
 
 import com.opdar.gulosity.replication.base.Registry;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
@@ -23,7 +24,13 @@ public class RequestLog {
             byte[] b = new byte[length];
             randomAccessFile.read(b);
             return b;
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {}finally {
+            if(randomAccessFile != null) try {
+                randomAccessFile.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return null;
     }
 }
