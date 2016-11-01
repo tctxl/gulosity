@@ -2,9 +2,7 @@ package com.opdar.gulosity.replication.listeners;
 
 import com.opdar.gulosity.base.RowCallback;
 import com.opdar.gulosity.entity.RowEntity;
-import com.opdar.gulosity.event.binlog.RowsEvent.Type;
-import com.opdar.gulosity.replication.deserializer.JavaDeserializer;
-import com.opdar.gulosity.utils.BufferUtils;
+import com.opdar.gulosity.replication.base.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +11,7 @@ import java.nio.ByteBuffer;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-
-import static com.opdar.gulosity.event.binlog.RowsEvent.Type.WRITEV2;
 
 /**
  * 协议
@@ -28,10 +23,6 @@ import static com.opdar.gulosity.event.binlog.RowsEvent.Type.WRITEV2;
  */
 public class StoreRowListener implements RowCallback {
 
-    //store file path
-    private String storeFilePath = "file.dat";
-    //unit is kb
-    private int maxSize = 1024;
     private Logger logger = LoggerFactory.getLogger(StoreRowListener.class);
 
     @Override
@@ -72,20 +63,16 @@ public class StoreRowListener implements RowCallback {
         }
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(storeFilePath, true);
+            fileOutputStream = new FileOutputStream(Registry.FILE_PATH, true);
             byte[] arrays = arrayOut.toByteArray();
             int len = arrays.length;
-
             fileOutputStream.write((byte) (len >>> 24));
             fileOutputStream.write((byte) (len >>> 16));
             fileOutputStream.write((byte) (len >>> 8));
             fileOutputStream.write((byte) (len & 0xFF));
             fileOutputStream.write(arrays);
             fileOutputStream.flush();
-            logger.info("store file size : {}", fileOutputStream.getChannel().size());
-            long ia = fileOutputStream.getChannel().size() - arrays.length - 4;
-            System.out.println(ia);
-            read((int) ia);
+            logger.debug("store file size : {}", fileOutputStream.getChannel().size());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -99,75 +86,6 @@ public class StoreRowListener implements RowCallback {
                 }
             }
         }
-    }
-
-    private void read(int seek) {
-
-        RandomAccessFile randomAccessFile = null;
-        try {
-            randomAccessFile = new RandomAccessFile(storeFilePath, "r");
-            randomAccessFile.seek(seek);
-            int length = randomAccessFile.readInt();
-            byte[] b = new byte[length];
-            randomAccessFile.read(b);
-            ByteBuffer buffer = ByteBuffer.wrap(b);
-            int event = buffer.get();
-            long tableId = buffer.getLong();
-            length = buffer.getInt();
-            String[] tableName = BufferUtils.readFixedString(buffer, length).split("\\.", 2);
-            RowEntity rowEntity = getRowEntity(buffer, event, tableId, tableName);
-            logger.info("read length : {}", length);
-            logger.info("row1 : {}", rowEntity);
-            if (event == 3) {
-                RowEntity rowEntity2 = getRowEntity(buffer, event, tableId, tableName);
-                logger.info("row2 : {}", rowEntity2);
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (randomAccessFile != null) {
-                    randomAccessFile.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private RowEntity getRowEntity(ByteBuffer buffer, int event, long tableId, String[] tableName) {
-        int columnSize = buffer.get();
-        LinkedList<String> columnInfo = new LinkedList<String>();
-        for (int i = 0; i < columnSize; i++) {
-            int len = buffer.getInt();
-            String result = BufferUtils.readFixedString(buffer, len);
-            columnInfo.add(result);
-        }
-        columnSize = buffer.get();
-        int[] resultType = new int[columnSize];
-        for (int i = 0; i < columnSize; i++) {
-            int rt = buffer.getInt();
-            resultType[i] = rt;
-        }
-        columnSize = buffer.get();
-        Type type = event == 1 ? WRITEV2 : event == 2 ? Type.DELETEV2 : Type.UPDATEV2;
-        RowEntity rowEntity = new RowEntity(columnSize, type, tableName[0], tableName[1], columnInfo, tableId);
-        for (int i = 0; i < columnSize; i++) {
-            int len = buffer.getInt();
-            if (len != 0) {
-                byte[] result = BufferUtils.readFixedData(buffer, len);
-                int rt = resultType[i];
-                Object o = null;
-                try {
-                    o = JavaDeserializer.get(rt).getValue(result);
-                } catch (Exception ignored) {}
-                rowEntity.set(i, rt, o);
-            }
-        }
-        return rowEntity;
     }
 
 
