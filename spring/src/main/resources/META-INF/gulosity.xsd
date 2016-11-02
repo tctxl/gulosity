@@ -13,6 +13,9 @@
         <xsd:complexType>
             <xsd:complexContent>
                 <xsd:extension base="beans:identifiedType">
+                    <xsd:sequence>
+                        <xsd:element name="listeners" type="client-callback" minOccurs="0" maxOccurs="1"/>
+                    </xsd:sequence>
                     <xsd:attribute name="host" type="xsd:string" use="required"/>
                     <xsd:attribute name="port" type="xsd:int" use="required"/>
                     <xsd:attribute name="uid" type="xsd:int" use="optional"/>
@@ -52,6 +55,16 @@
     <xsd:complexType name="listener" >
         <xsd:sequence>
             <xsd:element name="listener" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:attribute use="required" name="class" type="xsd:string"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="client-callback" >
+        <xsd:sequence>
+            <xsd:element name="client-callback" minOccurs="0" maxOccurs="unbounded">
                 <xsd:complexType>
                     <xsd:attribute use="required" name="class" type="xsd:string"/>
                 </xsd:complexType>

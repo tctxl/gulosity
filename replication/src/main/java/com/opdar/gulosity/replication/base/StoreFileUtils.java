@@ -60,6 +60,7 @@ public class StoreFileUtils {
         RowEntity rowEntity2 = null;
         if (event == 3) {
             rowEntity2 = getRowEntity(buffer, event, tableId, tableName);
+            logger.info("row2 : {}", rowEntity2);
         }
         if(rowCallback != null){
             rowCallback.onNotify(rowEntity,rowEntity2);
