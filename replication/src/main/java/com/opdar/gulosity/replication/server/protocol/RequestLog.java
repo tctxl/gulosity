@@ -15,6 +15,10 @@ public class RequestLog {
         return position;
     }
 
+    public RequestLog(int position) {
+        this.position = position;
+    }
+
     public byte[] read() {
         RandomAccessFile randomAccessFile = null;
         try {

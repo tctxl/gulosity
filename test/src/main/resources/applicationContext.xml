@@ -12,12 +12,13 @@
 
     <context:component-scan base-package="test"/>
 
-    <gulosity:context serverId="10" id="gulosity" host="192.168.1.147" port="10912" userName="root" passWord="123456"
+    <gulosity:context serverId="10" id="gulosity-context" host="192.168.1.147" port="10912" userName="root" passWord="123456"
                       defaultDatabaseName="mysql">
         <gulosity:listeners>
             <gulosity:listener class="test.TestListener"/>
-            <gulosity:listener class="com.opdar.gulosity.replication.listeners.StoreRowListener"/>
         </gulosity:listeners>
         <gulosity:mapping package="test" />
+        <gulosity:server port="12034" disk-path="file.dat"/>
     </gulosity:context>
+    <gulosity:client id="gulosity-client" host="localhost" port="12034" uid="333" />
 </beans>

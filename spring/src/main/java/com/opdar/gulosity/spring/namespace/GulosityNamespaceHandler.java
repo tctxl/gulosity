@@ -8,5 +8,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 public class GulosityNamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
         registerBeanDefinitionParser("context", new ContextParser());
+        registerBeanDefinitionParser("client", new ClientParser());
     }
 }

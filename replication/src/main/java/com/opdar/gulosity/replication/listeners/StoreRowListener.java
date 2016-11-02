@@ -3,6 +3,7 @@ package com.opdar.gulosity.replication.listeners;
 import com.opdar.gulosity.base.RowCallback;
 import com.opdar.gulosity.entity.RowEntity;
 import com.opdar.gulosity.replication.base.Registry;
+import com.opdar.gulosity.replication.base.StoreCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,8 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * 协议
@@ -24,6 +27,7 @@ import java.util.List;
 public class StoreRowListener implements RowCallback {
 
     private Logger logger = LoggerFactory.getLogger(StoreRowListener.class);
+    private Queue<StoreCallback> storeCallbacks = new ConcurrentLinkedQueue<StoreCallback>();
 
     @Override
     public void onNotify(RowEntity entity, RowEntity entity2) {
@@ -73,6 +77,10 @@ public class StoreRowListener implements RowCallback {
             fileOutputStream.write(arrays);
             fileOutputStream.flush();
             logger.debug("store file size : {}", fileOutputStream.getChannel().size());
+            for(StoreCallback storeCallback:storeCallbacks){
+                int nextPosition = (int) fileOutputStream.getChannel().size();
+                storeCallback.store(nextPosition - 4 - len,nextPosition);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -86,6 +94,10 @@ public class StoreRowListener implements RowCallback {
                 }
             }
         }
+    }
+
+    public void addStoreCallback(StoreCallback storeCallback){
+        storeCallbacks.add(storeCallback);
     }
 
 

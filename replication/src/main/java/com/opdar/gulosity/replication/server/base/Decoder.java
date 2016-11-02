@@ -2,6 +2,8 @@ package com.opdar.gulosity.replication.server.base;
 
 import com.opdar.gulosity.replication.server.protocol.Heartbeat;
 import com.opdar.gulosity.replication.server.protocol.RequestLog;
+import com.opdar.gulosity.replication.server.protocol.RequestPos;
+import com.opdar.gulosity.utils.BufferUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,6 +13,7 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.util.ReferenceCountUtil;
 
 import java.net.SocketAddress;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
@@ -73,8 +76,16 @@ public class Decoder extends ChannelInboundHandlerAdapter {
                         break;
                     case 2:
                         //start seek
-                        RequestLog requestLog = new RequestLog();
+                        int position = (int) BufferUtils.readBELog(bytes,4);
+                        RequestLog requestLog = new RequestLog(position);
                         channelHandlerContext.fireChannelRead(requestLog);
+                        break;
+                    case 3:
+                        //start seek
+                        RequestPos requestPos = new RequestPos();
+                        String uid = new String(bytes);
+                        requestPos.setUid(uid);
+                        channelHandlerContext.fireChannelRead(requestPos);
                         break;
                     default:
                         break;

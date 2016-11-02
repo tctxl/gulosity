@@ -2,6 +2,8 @@ package com.opdar.gulosity.replication.base;
 
 import com.opdar.gulosity.replication.server.base.IoSession;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -9,10 +11,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Registry {
     //store file path
-    public static final String FILE_PATH = "file.dat";
+    public static String FILE_PATH = "file.dat";
+    public static int MAX_SIZE = 10240;
+
     public static final ConcurrentHashMap<String, IoSession> registryClients = new ConcurrentHashMap<String, IoSession>();
 
-    public static IoSession remove(Object key) {
+    public static IoSession remove(String key) {
         return registryClients.remove(key);
     }
 
@@ -24,7 +28,34 @@ public class Registry {
         return registryClients.size();
     }
 
-    public static IoSession get(Object key) {
+    public static boolean containsKey(String key) {
+        return registryClients.containsKey(key);
+    }
+
+    public static IoSession get(String key) {
         return registryClients.get(key);
+    }
+
+    public static void notifyClients(int position, int nextPosition) {
+        byte[] b = null;
+        RandomAccessFile randomAccessFile = null;
+        try {
+            randomAccessFile = new RandomAccessFile(Registry.FILE_PATH, "r");
+            randomAccessFile.seek(position);
+            int length = randomAccessFile.readInt();
+            b = new byte[length];
+            randomAccessFile.read(b);
+        } catch (Exception ignored) {
+        } finally {
+            if (randomAccessFile != null) try {
+                randomAccessFile.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (null != b)
+            for (IoSession session : registryClients.values()) {
+                session.writeLog(nextPosition, b);
+            }
     }
 }

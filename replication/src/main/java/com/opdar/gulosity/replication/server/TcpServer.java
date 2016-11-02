@@ -1,5 +1,7 @@
 package com.opdar.gulosity.replication.server;
 
+import com.opdar.gulosity.replication.base.Registry;
+import com.opdar.gulosity.replication.base.StoreCallback;
 import com.opdar.gulosity.replication.server.base.Initializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -12,7 +14,7 @@ import io.netty.util.concurrent.DefaultPromise;
 /**
  * Created by 俊帆 on 2016/11/1.
  */
-public class TcpServer {
+public class TcpServer implements StoreCallback{
     private EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private EventLoopGroup workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 1);
     private ChannelFuture channelFuture;
@@ -23,7 +25,7 @@ public class TcpServer {
         b.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(initializer);
-        channelFuture = b.bind(port).sync().channel().closeFuture().sync();
+        channelFuture = b.bind(port).sync();
     }
 
     public boolean close() {
@@ -43,5 +45,10 @@ public class TcpServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void store(int position, int nextPosition) {
+        Registry.notifyClients(position,nextPosition);
     }
 }

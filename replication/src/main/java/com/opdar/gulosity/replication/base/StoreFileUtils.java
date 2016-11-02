@@ -1,5 +1,6 @@
 package com.opdar.gulosity.replication.base;
 
+import com.opdar.gulosity.base.RowCallback;
 import com.opdar.gulosity.entity.RowEntity;
 import com.opdar.gulosity.event.binlog.RowsEvent;
 import com.opdar.gulosity.replication.deserializer.JavaDeserializer;
@@ -29,18 +30,7 @@ public class StoreFileUtils {
             int length = randomAccessFile.readInt();
             byte[] b = new byte[length];
             randomAccessFile.read(b);
-            ByteBuffer buffer = ByteBuffer.wrap(b);
-            int event = buffer.get();
-            long tableId = buffer.getLong();
-            length = buffer.getInt();
-            String[] tableName = BufferUtils.readFixedString(buffer, length).split("\\.", 2);
-            RowEntity rowEntity = getRowEntity(buffer, event, tableId, tableName);
-            logger.info("read length : {}", length);
-            logger.info("row1 : {}", rowEntity);
-            if (event == 3) {
-                RowEntity rowEntity2 = getRowEntity(buffer, event, tableId, tableName);
-                logger.info("row2 : {}", rowEntity2);
-            }
+            parseRow(b);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -53,6 +43,26 @@ public class StoreFileUtils {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public static void parseRow(byte[] b) {
+        ByteBuffer buffer = ByteBuffer.wrap(b);
+        parseRow(buffer,null);
+    }
+
+    public static void parseRow(ByteBuffer buffer, RowCallback rowCallback) {
+        int event = buffer.get();
+        long tableId = buffer.getLong();
+        int length = buffer.getInt();
+        String[] tableName = BufferUtils.readFixedString(buffer, length).split("\\.", 2);
+        RowEntity rowEntity = getRowEntity(buffer, event, tableId, tableName);
+        RowEntity rowEntity2 = null;
+        if (event == 3) {
+            rowEntity2 = getRowEntity(buffer, event, tableId, tableName);
+        }
+        if(rowCallback != null){
+            rowCallback.onNotify(rowEntity,rowEntity2);
         }
     }
 
