@@ -1,6 +1,5 @@
 package com.opdar.gulosity.replication.server.base;
 
-import com.opdar.gulosity.replication.base.Registry;
 import com.opdar.gulosity.replication.server.protocol.Heartbeat;
 import com.opdar.gulosity.replication.server.protocol.RequestLog;
 import com.opdar.gulosity.replication.server.protocol.RequestPos;
@@ -63,7 +62,8 @@ public class Handler extends SimpleChannelInboundHandler<Object> {
         IoSession session = ctx.attr(SESSION_FLAG).get();
         if (result instanceof Heartbeat) {
             //接收并返回心跳
-            session.heartbeat();
+            if(session.getHeartbeat() != null)
+                session.getHeartbeat().clearHeartbeat();
         } else if (result instanceof RequestLog) {
             //客户端主动请求Log
             byte[] ready = ((RequestLog) result).read();

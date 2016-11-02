@@ -1,7 +1,6 @@
 package com.opdar.gulosity.replication.server.base;
 
 import com.opdar.gulosity.replication.base.Registry;
-import com.opdar.gulosity.replication.server.protocol.RequestPos;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,13 +15,31 @@ import java.nio.ByteBuffer;
 public class IoSession {
     private final ChannelHandlerContext ctx;
     private String uid;
+    private HeartbeatInterval heartbeat=null;
 
     public IoSession(ChannelHandlerContext ctx) {
         this.ctx = ctx;
     }
 
+    public void initHeartbeat(){
+        heartbeat = new HeartbeatInterval(ctx) {
+            @Override
+            public void overtime() {
+                IoSession.this.downline();
+            }
+
+            @Override
+            public void heartbeat() {
+                IoSession.this.heartbeat();
+            }
+        };
+        heartbeat.setOvertime(5);
+        heartbeat.start();
+    }
+
     public void downline() {
         Registry.remove(uid);
+        ctx.close();
     }
 
     public void heartbeat() {
@@ -91,9 +108,14 @@ public class IoSession {
 
     public void setUid(String uid) {
         this.uid = uid;
+        initHeartbeat();
     }
 
     public String getUid() {
         return uid;
+    }
+
+    public HeartbeatInterval getHeartbeat() {
+        return heartbeat;
     }
 }

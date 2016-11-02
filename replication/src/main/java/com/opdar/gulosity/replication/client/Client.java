@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,12 +21,12 @@ import java.util.concurrent.Executors;
 public class Client implements RowCallback {
     SocketChannel channel;
     ExecutorService es = Executors.newSingleThreadExecutor();
+    private List<RowCallback> rowListeners = new LinkedList<RowCallback>();
 
     public static void main(String[] args) {
         try {
             Client client = new Client().open(new InetSocketAddress("localhost", 12034));
             client.requestPos();
-            client.requestLog(14104);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -49,19 +51,28 @@ public class Client implements RowCallback {
     }
 
     public void requestPos() throws IOException {
+        String uid = UUID.randomUUID().toString();
+        requestPos(uid);
+    }
+
+    public void requestPos(String uid) throws IOException {
         ByteArrayOutputStream barray = null;
         DataOutputStream dataOutputStream = new DataOutputStream(barray = new ByteArrayOutputStream());
         dataOutputStream.writeByte(3);
-        byte[] uid = UUID.randomUUID().toString().getBytes();
-        dataOutputStream.writeInt(uid.length);
-        dataOutputStream.write(uid);
+        dataOutputStream.writeInt(uid.getBytes().length);
+        dataOutputStream.write(uid.getBytes());
         ByteBuffer buff = ByteBuffer.wrap(barray.toByteArray());
         channel.write(buff);
     }
 
+    public void addRowCallback(RowCallback rowCallback){
+        this.rowListeners.add(rowCallback);
+    }
+
     @Override
     public void onNotify(RowEntity entity, RowEntity entity2) {
-        System.out.println(entity);
-        System.out.println(entity2);
+        for(RowCallback rowCallback:rowListeners){
+            rowCallback.onNotify(entity,entity2);
+        }
     }
 }

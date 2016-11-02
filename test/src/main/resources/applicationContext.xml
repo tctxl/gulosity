@@ -24,7 +24,7 @@
 
     <gulosity:client id="gulosity-client" host="localhost" port="12034" uid="333">
         <gulosity:listeners>
-            <gulosity:client-callback class="com.opdar.gulosity"/>
+            <gulosity:listener class="test.TestClientListener"/>
         </gulosity:listeners>
     </gulosity:client>
 </beans>

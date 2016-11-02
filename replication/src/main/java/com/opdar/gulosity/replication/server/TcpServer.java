@@ -37,16 +37,6 @@ public class TcpServer implements StoreCallback{
         return true;
     }
 
-    public static void main(String[] args){
-        TcpServer tcpServer = new TcpServer();
-        int testPort = 12034;
-        try {
-            tcpServer.start(testPort);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void store(int position, int nextPosition) {
         Registry.notifyClients(position,nextPosition);

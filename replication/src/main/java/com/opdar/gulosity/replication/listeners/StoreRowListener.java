@@ -76,7 +76,6 @@ public class StoreRowListener implements RowCallback {
             fileOutputStream.write((byte) (len & 0xFF));
             fileOutputStream.write(arrays);
             fileOutputStream.flush();
-            logger.debug("store file size : {}", fileOutputStream.getChannel().size());
             for(StoreCallback storeCallback:storeCallbacks){
                 int nextPosition = (int) fileOutputStream.getChannel().size();
                 storeCallback.store(nextPosition - 4 - len,nextPosition);
