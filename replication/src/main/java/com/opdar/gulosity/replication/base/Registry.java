@@ -36,7 +36,7 @@ public class Registry {
         return registryClients.get(key);
     }
 
-    public static void notifyClients(int position, int nextPosition) {
+    public static void notifyClients(long position, long nextPosition) {
         byte[] b = null;
         RandomAccessFile randomAccessFile = null;
         try {

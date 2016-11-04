@@ -23,15 +23,6 @@ public class Client implements RowCallback {
     ExecutorService es = Executors.newSingleThreadExecutor();
     private List<RowCallback> rowListeners = new LinkedList<RowCallback>();
 
-    public static void main(String[] args) {
-        try {
-            Client client = new Client().open(new InetSocketAddress("localhost", 12034));
-            client.requestPos();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public Client open(InetSocketAddress address) throws IOException {
         channel = SocketChannel.open();
         channel.connect(address);

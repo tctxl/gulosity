@@ -53,16 +53,16 @@ public class ReadRunnable implements Runnable {
                 }
                 case 2: {
                     //read log
-                    ByteBuffer dst = BufferUtils.readFixedData(channel, 8, ByteOrder.BIG_ENDIAN);
-                    int nextPosition = dst.getInt();
+                    ByteBuffer dst = BufferUtils.readFixedData(channel, 12, ByteOrder.BIG_ENDIAN);
+                    long nextPosition = dst.getLong();
                     int bodyLength = dst.getInt();
                     dst = BufferUtils.readFixedData(channel, bodyLength, ByteOrder.BIG_ENDIAN);
                     StoreFileUtils.parseRow(dst, rowCallback);
                     break;
                 }
                 case 3:{
-                    ByteBuffer dst = BufferUtils.readFixedData(channel, 4, ByteOrder.BIG_ENDIAN);
-                    int position = dst.getInt();
+                    ByteBuffer dst = BufferUtils.readFixedData(channel, 8, ByteOrder.BIG_ENDIAN);
+                    long position = dst.getLong();
                     System.out.println(position);
                     break;
                 }

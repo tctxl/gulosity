@@ -57,12 +57,12 @@ public class IoSession {
         });
     }
 
-    public void writeLog(int nextPosition, byte[] ready) {
-        ByteBuffer buffer = ByteBuffer.allocate(9 + ready.length);
+    public void writeLog(long nextPosition, byte[] ready) {
+        ByteBuffer buffer = ByteBuffer.allocate(13 + ready.length);
         //type
         buffer.put((byte)2);
         //seek pos
-        buffer.putInt(nextPosition);
+        buffer.putLong(nextPosition);
         //body length
         buffer.putInt(ready.length);
         //body...
@@ -80,7 +80,7 @@ public class IoSession {
         RandomAccessFile randomAccessFile = null;
         try {
             randomAccessFile = new RandomAccessFile(Registry.FILE_PATH, "r");
-            int size = (int) randomAccessFile.getChannel().size();
+            long size = randomAccessFile.getChannel().size();
             writePos(size);
         } catch (Exception ignored) {}finally {
             if(randomAccessFile != null) try {
@@ -91,11 +91,11 @@ public class IoSession {
         }
     }
 
-    public void writePos(int position) {
-        ByteBuffer buffer = ByteBuffer.allocate(5);
+    public void writePos(long position) {
+        ByteBuffer buffer = ByteBuffer.allocate(9);
         //type
         buffer.put((byte)3);
-        buffer.putInt(position);
+        buffer.putLong(position);
         ctx.writeAndFlush(buffer.array()).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture channelFuture) throws Exception {

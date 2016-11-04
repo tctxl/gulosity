@@ -38,7 +38,7 @@ public class TcpServer implements StoreCallback{
     }
 
     @Override
-    public void store(int position, int nextPosition) {
+    public void store(long position, long nextPosition) {
         Registry.notifyClients(position,nextPosition);
     }
 }

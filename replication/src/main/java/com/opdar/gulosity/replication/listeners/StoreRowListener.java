@@ -5,6 +5,7 @@ import com.opdar.gulosity.entity.RowEntity;
 import com.opdar.gulosity.replication.base.PositionIndexManager;
 import com.opdar.gulosity.replication.base.Registry;
 import com.opdar.gulosity.replication.base.StoreCallback;
+import com.opdar.gulosity.utils.BufferUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ public class StoreRowListener implements RowCallback {
             File file = new File(Registry.FILE_PATH);
             fileOutputStream = new FileOutputStream(file, true);
             byte[] arrays = arrayOut.toByteArray();
-            int currentPosition = (int) fileOutputStream.getChannel().size();
+            long currentPosition = fileOutputStream.getChannel().size();
             if(currentPosition == 0){
                 //write version
                 writeVersion(fileOutputStream);
@@ -98,7 +99,7 @@ public class StoreRowListener implements RowCallback {
             fileOutputStream.write((byte) (len & 0xFF));
             fileOutputStream.write(arrays);
             fileOutputStream.flush();
-            int nextPosition = (int) fileOutputStream.getChannel().size();
+            long nextPosition =  fileOutputStream.getChannel().size();
             positionIndexManager.addIndex(currentPosition,len+4);
             for(StoreCallback storeCallback:storeCallbacks){
                 storeCallback.store(nextPosition - 4 - len,nextPosition);

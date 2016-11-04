@@ -10,6 +10,7 @@ import java.io.RandomAccessFile;
  */
 public class RequestLog {
     private int position;
+    private int version;
 
     public int getPosition() {
         return position;
