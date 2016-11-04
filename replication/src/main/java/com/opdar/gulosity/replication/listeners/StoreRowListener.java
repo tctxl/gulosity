@@ -2,6 +2,7 @@ package com.opdar.gulosity.replication.listeners;
 
 import com.opdar.gulosity.base.RowCallback;
 import com.opdar.gulosity.entity.RowEntity;
+import com.opdar.gulosity.replication.base.PositionIndexManager;
 import com.opdar.gulosity.replication.base.Registry;
 import com.opdar.gulosity.replication.base.StoreCallback;
 import org.slf4j.Logger;
@@ -15,6 +16,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * 协议
@@ -28,6 +33,7 @@ public class StoreRowListener implements RowCallback {
 
     private Logger logger = LoggerFactory.getLogger(StoreRowListener.class);
     private Queue<StoreCallback> storeCallbacks = new ConcurrentLinkedQueue<StoreCallback>();
+    private PositionIndexManager positionIndexManager = new PositionIndexManager();
 
     @Override
     public void onNotify(RowEntity entity, RowEntity entity2) {
@@ -67,17 +73,34 @@ public class StoreRowListener implements RowCallback {
         }
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(Registry.FILE_PATH, true);
+            File file = new File(Registry.FILE_PATH);
+            fileOutputStream = new FileOutputStream(file, true);
             byte[] arrays = arrayOut.toByteArray();
+            int currentPosition = (int) fileOutputStream.getChannel().size();
+            if(currentPosition == 0){
+                //write version
+                writeVersion(fileOutputStream);
+            }
             int len = arrays.length;
+            if((currentPosition+len )/1024 > Registry.MAX_SIZE){
+                compress(file,positionIndexManager.getVersion());
+                fileOutputStream.close();
+                file.delete();
+                fileOutputStream = new FileOutputStream(file, true);
+                //write version
+                writeVersion(fileOutputStream);
+                positionIndexManager.delete();
+                positionIndexManager = new PositionIndexManager();
+            }
             fileOutputStream.write((byte) (len >>> 24));
             fileOutputStream.write((byte) (len >>> 16));
             fileOutputStream.write((byte) (len >>> 8));
             fileOutputStream.write((byte) (len & 0xFF));
             fileOutputStream.write(arrays);
             fileOutputStream.flush();
+            int nextPosition = (int) fileOutputStream.getChannel().size();
+            positionIndexManager.addIndex(currentPosition,len+4);
             for(StoreCallback storeCallback:storeCallbacks){
-                int nextPosition = (int) fileOutputStream.getChannel().size();
                 storeCallback.store(nextPosition - 4 - len,nextPosition);
             }
         } catch (FileNotFoundException e) {
@@ -91,6 +114,48 @@ public class StoreRowListener implements RowCallback {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    private int writeVersion(FileOutputStream fileOutputStream) throws IOException {
+        int version = positionIndexManager.getVersion()+1;
+        fileOutputStream.write((byte) (version >>> 24));
+        fileOutputStream.write((byte) (version >>> 16));
+        fileOutputStream.write((byte) (version >>> 8));
+        fileOutputStream.write((byte) (version & 0xFF));
+        return version;
+    }
+
+    private void compress(File file,int version)  {
+        String zipFile = file+"."+version+".zip";
+        BufferedInputStream bis = null;ZipOutputStream zout = null;
+        try{
+            CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(zipFile),
+                    new CRC32());
+            zout = new ZipOutputStream(cos);
+            bis = new BufferedInputStream(new FileInputStream(file));
+            ZipEntry entry = new ZipEntry(file.getName());
+            zout.putNextEntry(entry);
+            int count;
+            byte data[] = new byte[1024];
+            while ((count = bis.read(data, 0, 1024)) != -1) {
+                zout.write(data, 0, count);
+            }
+        }catch (Exception ignored){}finally {
+            try {
+                if (bis != null) {
+                    bis.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (zout != null) {
+                    zout.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -13,10 +13,5 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.0.6.Final</version>
-        </dependency>
     </dependencies>
 </project>

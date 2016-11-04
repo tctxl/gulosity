@@ -19,7 +19,7 @@
             <gulosity:listener class="test.TestListener"/>
         </gulosity:listeners>
         <gulosity:mapping package="test"/>
-        <gulosity:server port="12034" disk-path="file.dat" max-size="10241"/>
+        <gulosity:server port="12034" disk-path="file.dat" max-size="3"/>
     </gulosity:context>
 
     <gulosity:client id="gulosity-client" host="localhost" port="12034" uid="333">
