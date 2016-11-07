@@ -33,7 +33,7 @@ public class IoSession {
                 IoSession.this.heartbeat();
             }
         };
-        heartbeat.setOvertime(5);
+        heartbeat.setOvertime(30);
         heartbeat.start();
     }
 

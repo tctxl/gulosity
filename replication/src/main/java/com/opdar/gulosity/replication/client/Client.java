@@ -19,8 +19,8 @@ import java.util.concurrent.Executors;
  * Created by 俊帆 on 2016/11/1.
  */
 public class Client implements RowCallback {
-    SocketChannel channel;
-    ExecutorService es = Executors.newSingleThreadExecutor();
+    private SocketChannel channel;
+    private ExecutorService es = Executors.newSingleThreadExecutor();
     private List<RowCallback> rowListeners = new LinkedList<RowCallback>();
 
     public Client open(InetSocketAddress address) throws IOException {
@@ -56,14 +56,14 @@ public class Client implements RowCallback {
         channel.write(buff);
     }
 
-    public void addRowCallback(RowCallback rowCallback){
+    public void addRowCallback(RowCallback rowCallback) {
         this.rowListeners.add(rowCallback);
     }
 
     @Override
     public void onNotify(RowEntity entity, RowEntity entity2) {
-        for(RowCallback rowCallback:rowListeners){
-            rowCallback.onNotify(entity,entity2);
+        for (RowCallback rowCallback : rowListeners) {
+            rowCallback.onNotify(entity, entity2);
         }
     }
 }

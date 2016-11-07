@@ -25,6 +25,7 @@
     <gulosity:client id="gulosity-client" host="localhost" port="12034" uid="333">
         <gulosity:listeners>
             <gulosity:listener class="test.TestClientListener"/>
+            <gulosity:listener class="test.TestClientListener2"/>
         </gulosity:listeners>
     </gulosity:client>
 </beans>
